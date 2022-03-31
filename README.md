@@ -381,16 +381,127 @@ Cores {
 }
 ```
 
-### Exemplo de tipagem
+## Unknown
+Funciona de maneira semelhante de any, porém nele existem algumas restrições que deixam esse tipo mais seguro, por exemplo: Não é possível realizar contas com esse tipo de dados, por não saber o tipo do valor que está armazenado nele
+
+> Bom utilizar ele no lugar do any
 
 ```ts
+let x : unknown;
+const y = 10; //tipagem dinamica
 
+console.log(x + y) //Erro: Não é possível realizar a conta com o x, pois ele é unknown
 ```
 
+## Union types
 
+Quando existe mais de um tipo de retorno, podemos dizer iso para o typescript através do sinal de pipe |
 
+Porém quando se usa mais um tipo de dado em um campo, o typescript tera mais vigor em pedir validações para você
 
+```ts
+string | number | boolean // ou string ou number ou boolean
 
+//exemplo
+//O typescript requer que validações do campo seja feita
+function add (x: number | string, y: number | string): number | string {
+	if (typeof(x) === 'number' && typeof(y) === 'number') return x + y;
+	return `${x}${y}`;
+};
+```
+
+## Tipos literais
+
+Utilizar valores como tipos
+
+Como assim? Por exemplo, temos a seguinte linha `const x = 10;` o valor literal será um number, porém o subtipo será 10, já que boa parte dos números é um subtipo de number.
+
+Então em teoria temos: 
+- Tipo => Subtipo
+	- String => 'Willian'
+	- Number => 10
+
+Ai podemos escolher oque usar em nossas variavel, objetos e arrays. Vamos utilizar o tipo ou o subtipo? Quando se da para utilizar o subtipo, você está limitando ainda mais a gama de coisas que podem entrar no campo, por um lado aumenta deverás a segurnaça, porém por outro você limita o campo.
+
+Exemplo
+```ts
+const pessoa = {
+	nome: 'Willian' as const, // O valor desse campo será o subtipo da string que será 'Willian' :3. O nome do que aconteceu aqui é asserção
+	sobrenome: 'Soncini'
+}
+
+// O tipo do dado passado para essa função, só poderá ser 'Azul' ou 'Amarelo'. E não qualquer string
+function escolhaCor(cor: 'Azul' | 'Amarelo') {
+	return cor;
+}
+```
+
+## Type alias
+
+Agora podemos criar nossos próprio tipos de dados. Sente o poder 🚀
+
+Definimos o tipo do dados através da palavra  `type`
+
+É como se você estivesse fazendo um contrato.
+
+Exemplo
+
+```ts
+type Idade = number;
+type Pessoa = {
+	nome: string,
+	idade: Idade,
+	corPreferida?: string,
+};
+
+type CorRGB = 'vermelho' | 'verde' | 'azul';
+type CorCMYK = 'ciano' | magenta | 'amarelo';
+type CorPreferida = CorRGB | CorCMYK;
+
+const pessoa: Pessoa = {
+	idade 30,
+	nome: 'Willian',
+	salario: 999_999_999_999_999, //Ele aceita os números separados por virgula tranquilamente
+}
+
+expor function setCorPreferida(pessoa: Pessoa, cor: CorPreferida) : Pessoa {
+	return { ...pessoa, corPreferida: cor};
+}
+
+setCorPreferida(pessoa, 'Azul');
+```
+
+Lembrando que no código acima não está sendo criado nenhuma variavel, somente tipos de variaveis.
+
+## Intersection Types
+
+A gente tem os operadores `|` e o `&`, que são resprectivamente  `Ou E`. Enquanto o operador 'OU' não obriga a atribuição do valor, o operador 'E' obriga fazer essa atribuição.
+
+Exemplos
+
+```ts
+type TemNome = { nome: string };
+type TemSobrenome = { sobrenome: string};
+type Pessoa = Temnome & TemSobrenome | TemIdade;
+
+// Com isso ele obrigara os campos 'nome, sobrenome', e não obrigara o campo idade.
+const pessoa: Pessoa = {
+	nome: 'Willian',
+	sobrenome: 'Soncini',
+};
+```
+
+Porém da para utilizar isso para pegar oque tem em comum entre tipos.
+
+Para quem já fez `INNER JOIN` é muito parecido, porém oque é pego é somente as chaves de ligamento
+
+Exemplo:
+```ts
+type AB = 'A' | 'B';
+type AC = 'A' | 'C';
+
+type Intersecao = AB & AC // 'A' - Traz oque os types tiver em comum.
+```
 
 
 
