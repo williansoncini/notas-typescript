@@ -61,13 +61,13 @@ Dentro do vscode, com a extensão de code-runner instalada, faça as seguintes p
 ## instalação
 ```js
 npm i eslint -D
-npm i @typescript-eslint-plugin @typescript-eslint/parser -D
+npm i @typescript-eslint/eslint-plugin @typescript-eslint/parser -D
 ```
 
 Se não tiver ainda, você precisa da extenção do es lint no vs code :3
 
 ## Arquivo de configuração
-O Eslint precisa do arquivo `eslintrx.js` na raiz do seu projeto, para conseguir fazer as correções :3
+O Eslint precisa do arquivo `eslintrc.js` na raiz do seu projeto, para conseguir fazer as correções :3
 
 ## Exemplo de `.eslintrc.js`
 Sem regras :3
@@ -504,9 +504,112 @@ type Intersecao = AB & AC // 'A' - Traz oque os types tiver em comum.
 ```
 
 
+## Funções como tipo
 
+Assim como definimos tipos do tipo objeto, é possível definir tipos com funções.
 
+```ts
+//Definindo o tipo como uma função
+type MapStringsCallback = (item: string) => string;
 
+function mapStrings(array: string[], callbackfn: MapStringCallback): string[] {
+	const newArray: string[] = [];
+	for (let i; i < array.length; i++){
+		//Passando o array[i] como 'item'
+		newArray.push(callbackfn(array[i]));
+	}
+
+	return newArray;
+}
+
+const abc ['a', 'b', 'c'];
+//A função está retornando uma string, assim como definido em seu tipo
+const abcMapped = mapStrings(abc, (item) => item.toUpperCase());
+```
+
+## Strutural type
+Usado para estruturar os tipos que farão determinado processo. Isso é muit utilzado em interfaces para definição de regas, segue um exemplo abaixo:
+
+```ts
+// Aqui criamos as regras dessa funcionalidade
+type VerifyUserFn = (user: User, sentValue: User) => boolean;
+// Aqui definimos constrato
+type User = { username: string, password: string}
+
+const verifyUser : VerifyUser = (user, sentValue) => {
+	return user.username === sentVale.usernmae && user.password === sentValue.password;
+}
+
+const bdUser = { username: 'Willian', password: 'strong_pass'};
+const sentUser = { username: 'Willian', password: 'strong_pass'};
+// Seguimos a regra e aplicamos o contrato corretamente
+const loggedIn = verifyUser(bdUser, sentUser); // true
+```
+
+## Type assertions
+Utilizado para indicar qual sera o tipo do campo. Por muitas vezes, funções e outras possibilidades podem retornar vários valores, por exemplo `string | null` , então com a asserção de tipos, podemos garantir qual será o tipo do campo.
+
+> Para utilizar isso é necessário ter o campo `["DOM"]`, dentro do array `"lib"` no arquivo `tsconfig.json`
+
+### Non-null assertion (!) - Não recomendado
+Indicado com o simbolo `!` ao final do código
+```ts
+const body = document.querySelector('body')!;
+```
+
+### Type assertion - Recomendado ✅
+```ts
+const body = docuent.querySelector('body') as HTMLBodyElement;
+```
+
+# Configurando o webpack
+Vamos trabalhar com fronend?
+
+Sempre é mais indicado consultar a documentação colega :3
+
+https://webpack.js.org/guides/typescript/
+
+## instalação
+```node
+npm i ts-loader webpack webpack-cli -D
+```
+
+## Configuração
+Exemplo de configuração em modo desenvolvimento
+
+Dados pertencentes ao arquivo `webpack.config.js`
+
+```js
+const path = require('path');
+
+module.exports = {
+  mode: 'development',
+  entry: './src/index.ts',
+  module: {
+    rules: [
+      {
+        test: /\.tsx?$/,
+        use: 'ts-loader',
+        exclude: /node_modules/,
+      },
+    ],
+  },
+  resolve: {
+    extensions: ['.tsx', '.ts', '.js'],
+  },
+  output: {
+    filename: 'bundle.js',
+    path: path.resolve(__dirname, 'dist'),
+  },
+  devtool: 'source-map',
+};
+```
+
+## Compilando arquivos
+```js
+npx webpack
+npx webpack -w //Para ele ficar assistindo as sua mudanças
+```
 
 
 
