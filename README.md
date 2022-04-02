@@ -637,5 +637,177 @@ npx webpack
 npx webpack -w //Para ele ficar assistindo as sua mudanças
 ```
 
+# Importação de libs que precisam de  declaration files
+Quando importamos uma lib para nosso projeto, é necessário importar na versão de devensolvimento essa lib para o typescript.
 
+Por exemplo vamos importar a lib `validator` para nosso projeto, então precisamos fazer a instalação da seguinte forma se estivermos utilizando o typescript.
 
+```node
+npm i validator
+npm i @types/validator -D
+```
+
+Assim garatimos que a lib funcione no typescript enquanto estamos desenvolvendo :3
+
+> Sinceramente não sei se é necessário fazer isso para todas as libs
+
+# Utilizando o this dentro de  arrow functions
+> Tome cuidado em utilizar this em arrow functions
+
+O `this` de uma arrow function sempre será pego de onde a função é declarada, então com muita facilidade você pode acabar utilizando o `this` global em vez do `this`  do contexto que deseja :3
+
+# Classes
+Com classes podemos deixar nosso código mais organizado e seguro. Podemos aplicar diversos conceitos de segurança para isso, então utilizar classes para encapsulamento é só sucesso!
+
+> Classes podem ser utilizadas como tipos também!
+
+## Criação
+Só demonstrando algumas formas de definir uma class
+
+**Primeira e mais delicinha**
+
+```ts
+class Empresa {
+	constructor(
+		private nome: string,
+	)
+}
+```
+
+**Segunda - Aqui fica mais verboso**
+
+```ts
+class Empresa {
+	private nome : string;
+
+	constructor(nome: string){
+		this.nome = nome;
+	};
+}
+```
+
+## Acessos
+Para acessar os valores dos atributos de uma classe, podemos utilizar três operadores.
+
+[Referencia das informações](https://pt.stackoverflow.com/questions/23/qual-%C3%A9-a-diferen%C3%A7a-entre-modificadores-public-default-protected-e-private)
+
+```
+ Modifier      Class   Package   Subclass   World
+──────────────────────────────────────────────────
+ public          ✔        ✔         ✔         ✔
+
+ protected       ✔        ✔         ✔         ✘
+
+ no modifier     ✔        ✔         ✘         ✘
+
+ private         ✔        ✘         ✘         ✘
+──────────────────────────────────────────────────
+```
+
+### Public ( Cuidado ⚠ )
+O atributo que receber esse tipo de acesso, poderá ter seu valor modificado externamente.
+
+> Um atributo que é alterado externamente não tem segurança nenhuma, então tome muito cuidado ao utilizar esse operador
+
+```ts
+class Empresa{
+	constructor(
+		public nome: string,
+	){}
+};
+
+const empresa = Empresa('Tesla');
+empresa.nome = 'Amazon';
+
+//Todo mundo vai poder alterar essse cara, isso é péssimo! Toma cuidado com isso aqui @-@
+```
+
+### Private ( Sempre tente utilizar esse ✅ )
+O atributo que receber esse tipo de acesso, não poderá ter seu valor modificado externamente. Somente a classe que o declarou poderá o acessar, oque nos trás diversas vantagens em termos de encapsulamento e segurança.
+
+```ts
+class Empresa {
+	constructor(
+		private readonly nome: string,
+	){}
+};
+
+const empresa = new Empresa('Tesla');
+```
+
+### Protected ( Utilizado para herança )
+Isso aqui nos permite ter acesso por herança. Se uma extende de outra classe, essa tera acesso a seus atributos protected. Atributos protected só podem ser acessados se sua classe pai estive estendida
+
+```ts
+export class Colaborador{
+	constructor (
+		protected readonly nome: string,
+	){}
+};
+
+export class Empresa {
+	private readonly colaboradores : Coladores[], // Aqui consigo ter acesso ao campo protect numa boa, poderia fazer colaboradores[n].nome = 'Thomaz' se fosse necessário.
+
+	constructor(
+		private readonly nome : string,
+	){}
+
+	adicionaColaborador(colaborador: Colaborador){
+		this.colaboradores.push(colaborador);
+	}
+};
+
+const empresa = new Empresa('Telsa');
+const colaborador = new Colaborador('Albert');
+empresa.adicionaColaborador(colaborador);
+```
+
+# Herança 👪
+Com herança podemos reutilizar muito código, e nela podemos aplicar polimosfirmos, caso desejemos algum comportamento diferente da classe pai.
+
+Uma herança funciona da seguinte forma: O pai tem suas caracteristicas. Quando um pai tem um filho, o filho também terá as caracteristicas do pai. Assim é na programação também.
+
+## Polimorfismo
+Quando um filho precisa ter um comportamento diferente do pai, ele pode sobreescrever o método do pai, com suas proprias caracteristicas.
+
+## Exemplo
+Considere a seguinte estrutura
+
+Site uitlizado: https://www.yworks.com/yed-live/
+
+![[./img/diagrama.png]]
+
+-  + = Publico
+-  - = Privado
+-  #  = Protected
+
+Em código teremos algo parecido com:
+
+```ts
+class Pessoa{
+	constructor(
+		public nome : string,
+		public sobrenome: string,
+		private idade: number,
+		protected cpf: string,
+	);
+
+	getIdade() : number { return this.idade};
+	getCpf(): string { return this.cpf };
+	getNomeCompleto() : string { return `${this.nome} ${this.sobrenome}`;
+};
+
+class Aluno extends Pessoa {
+	// Polimorfismo - O filho terá um comportamento diferente do pai
+	getNomeCompleto(): string {
+		return `ALUNO: ${this.nome} ${this.sobrenome}`
+	};
+}
+
+class Colaborador extends Pessoa{
+	// Polimorfismo - O filho terá um comportamento diferente do pai
+	getNomeCompleto() : string {
+		return `COLABORADOR: ${this.nome} ${this.sobrenome}` 
+	}
+}
+```
