@@ -788,9 +788,9 @@ Site uitlizado: https://www.yworks.com/yed-live/
 
 ![](img/diagrama.png)
 
--  + = Publico
--  - = Privado
--  #  = Protected
+- \+ Publico
+- \- Privado
+- \# Protected
 
 Em código teremos algo parecido com:
 
