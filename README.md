@@ -43,6 +43,17 @@ Belezera, aqui vou colocar algumas notas de typescript que estou aprendendo :3
   - [instalação](#instalação-2)
   - [Configuração](#configuração)
   - [Compilando arquivos](#compilando-arquivos-1)
+- [Importação de libs que precisam de  declaration files](#importação-de-libs-que-precisam-de--declaration-files)
+- [Utilizando o this dentro de  arrow functions](#utilizando-o-this-dentro-de--arrow-functions)
+- [Classes](#classes)
+  - [Criação](#criação)
+  - [Acessos](#acessos)
+    - [Public ( Cuidado ⚠ )](#public--cuidado--)
+    - [Private ( Sempre tente utilizar esse ✅ )](#private--sempre-tente-utilizar-esse--)
+    - [Protected ( Utilizado para herança )](#protected--utilizado-para-herança-)
+- [Herança 👪](#herança-)
+  - [Polimorfismo](#polimorfismo)
+  - [Exemplo](#exemplo)
 
 # Instalação
 ```js
@@ -775,7 +786,7 @@ Considere a seguinte estrutura
 
 Site uitlizado: https://www.yworks.com/yed-live/
 
-![[./img/diagrama.png]]
+![](img/diagrama.png)
 
 -  + = Publico
 -  - = Privado
