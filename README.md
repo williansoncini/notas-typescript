@@ -747,7 +747,9 @@ const empresa = new Empresa('Tesla');
 ```
 
 ### Protected ( Utilizado para herança )
-Isso aqui nos permite ter acesso por herança. Se uma extende de outra classe, essa tera acesso a seus atributos protected. Atributos protected só podem ser acessados se sua classe pai estive estendida
+Isso aqui nos permite ter acesso por herança. Se uma classe extende de outra classe, essa tera acesso a seus atributos protected. Atributos protected só podem ser acessados pelas classes estendidadas e pela super classe.
+
+> É tipo um private, só que compartilhado ahsidfuh
 
 ```ts
 export class Colaborador{
@@ -801,7 +803,7 @@ class Pessoa{
 		public sobrenome: string,
 		private idade: number,
 		protected cpf: string,
-	);
+	){};
 
 	getIdade() : number { return this.idade};
 	getCpf(): string { return this.cpf };
@@ -822,3 +824,243 @@ class Colaborador extends Pessoa{
 	}
 }
 ```
+
+## Construtores em subclasses
+Ao utilizar construtores em suas subclasses, você deve tomar cuidado para não sobrescrever a super classe.
+
+Mas caso você precise de construtores em suas sub classes, o código ficara mais ou menos assim:
+
+```ts
+//Super classe
+class Pessoa{
+	constructor(
+		private nome : string,
+		private sobrenome: string,
+	);
+};
+
+//Sub-classe
+class Aluno extends Pessoa {
+	constructor(
+		// Dessa maneira você não estará sobreescrevendo o atributo da superclasse.
+		// Apenas está indicando que a classe Aluno precisa também dos campos nome e sobrenome, isso devido a super classe.
+		nome: string, 
+		sobrenome: string,
+		private registroEscolar : string,
+	) {
+		super(nome, sobrenome);
+	}
+
+}
+```
+
+## Super
+Algumas vezes precismos acessar a super classe a partir de subclasses, então para isso temos os metodo super.
+
+```ts
+class Pessoa{
+	constructor(
+		private nome : string,
+	){};
+	getNome() : string { return this.nome };
+};
+
+class Colaborador extends Pessoa {
+	getNome() : string {
+		console.log('Fazendo algo antes da chamada do super');
+		super.getNome(); // Aqui estamos chamando o metodo genuino, que vem lá da classe pai (Super classe)
+	}
+}
+```
+
+## Getter e setter
+A maneira como o javascript trabalha com getter e setters é mais ou menos da seguinte forma.
+
+> Por conversão o atributo que recebera o getter ou o setter, fica com o nome com um underline antes, mais ou menos assim \_nome
+
+```ts
+class Pessoa{
+	constructor(
+		private _nome : string,
+	) {}
+
+	set nome(nome:string){
+		this._nome = nome;
+	}
+	get nome(): string {
+		return this._nome;
+	}
+}
+
+const pessoa = new Pessoa('Willian');
+pessoa.nome // getter
+pessoa.nome = 'Albert' // setter
+```
+
+## Atributos e metodos estaticos
+Métodos estaticos são acessados pela classe, porém sem a necessidade de instanciala.
+
+```ts
+class Pessoa {
+	static semSobrenome = '';
+
+	constructor(
+		private nome: string,
+		private sobrenome: string,
+	){}
+	
+	static criaPessoa(nome: string): Pessoa {
+		return new Pessoa(nome: string, Pessoa.semSobrenome)
+	};
+}
+
+const pessoa = new Pessoa.criaPessoa('Willian');
+```
+
+## Construtores privados e singletons
+Não permitir existir mais do que uma instancia, quando a classe for ser instanciada, ou retorna a instancia existente ou cria uma nova, mas sempre existira somente uma.
+
+```ts
+export class Database {
+	private static database: Database;
+
+	private constructor(
+		private host: string,
+		private database: string,
+		private user: string,
+		private password: string,
+	);
+
+	static getDatabase(
+		host:string,
+		database:string,
+		user:string,
+		password:string,
+	): Database {
+		if (Database.database) return Database.database;
+		Database.database = new Database(host, database, user, passwor);
+		return Database.database;
+	}
+}
+
+const db = Database.getDatabase('localhost', 'awesome_db', 'willian', 'strong_pass');
+```
+
+## Classes, metodos e atributos abstrados 📄
+Algo abstrato é algo apenas para servir como contrato, para forçar algo a ser implementado.
+
+Por exemplo, uma classe que é abstrata não podera ser implementada, ela servira somente para que outras classes herdem dela.
+
+Um método abastrato, devera ser implementado por todos aqueles que herdarem da super classe abstrata.
+
+> Se existe algo abstrato na super classe, as sub-classes terma que implementar tais coisas.
+
+Exemplo
+
+```ts
+// Essa classe nunca podera ser instanciada diretamente, ele server apenas como um contrato para que as outras classes implementem e tenham oque nela há.
+abstract class Personamen {
+	protected abstract emoji: string; // Todos que herdarem dessa classe, deveram implementar esse atributo
+
+	constructor(
+		private nome : string,
+		private vida : number,
+		private ataque: number,
+	){}
+
+	atacar(personagem : Personagem) : void {
+		this.bordao();
+		personagem.vida -= this.ataque;
+	};
+
+	abstract bordao() : void; // Todos que herdarem dessa classe, terá que implementar esse metodo.
+}
+
+class Guerreira extends Pernagem {
+	// A classe Personagem obriga a implementação do atributo abstrato emoji
+	protected emoji = '🧝🏻‍♀️';
+
+	// A classe Personagem obriga a implementação do método abstrato 'bordao'
+	bordao(){
+		console.log(`${this.emoji} - Classe guerreira ao ataque!`);
+	};
+}
+
+class Monstro extends Personagem {
+	// A classe Personagem obriga a implementação do atributo abstrato emoji
+	protected emoji = '👾';
+
+	// A classe Personagem obriga a implementação do método abstrato 'bordao'
+	bordao(){
+		console.log(`${this.emoji} - Vem pro monstro vem!`);
+	};
+}
+
+const gurreira = new Guerreira('Guerreira', 25400, 3510);
+const monstro = new Monstro('Monstro', 45052, 1451);
+
+gurreira.atacar(monstro);
+monstro.atacar(gurreira);
+```
+
+## Associação de classes
+Uma classe usa outra sem que necessáriamente dependa da outra. Associação mais fraca.
+
+Exemplo abaixo:
+
+![](img/diagrama2.png)
+
+```ts
+abstract class Ferramenta{
+	constructor(
+		private _nome : string,
+	){}
+
+	get nome() : string {
+		return this._nome;
+	};
+
+	abstract escrever() : void;
+}
+
+class Caneta extends Ferramenta{
+	escrever() : void {
+		console.log('Escrevendo com caneta');
+	};
+}
+
+class MaquinaEscrever extends Ferramenta{
+	escrever() : void {
+		console.log('Maquina digitando');
+	};
+}
+
+class Escritor {
+	private _ferramenta: Ferramenta | null = null;
+
+	constructor(
+		private _nome : string,
+	){}
+
+	get nome() : string {
+		return this._nome;
+	};
+
+	set ferramenta (ferramenta: Ferramenta | null): void {
+		this._ferramenta = ferramenta;
+	};
+	
+	escrever(): void {
+		if (this.ferramenta === null){
+			console.log('Não posso escrever sem ferramenta');
+			return;
+		}
+		this._ferramenta.escrever();
+	};
+}
+
+```
+
+Vale lembrar que aqui também foi aplicado a **inversão de dependencia**, onde o escritor não depende diretamente da caneta ou da maquina de escrever, mas sim de um contrato, que fica responsavél por garantir que o escritor receba aquilo que ele espera.
+
+Escritor fica dependente da class abstrata Ferramenta, que é utilizada em Caneta e Maquina de escrever. 
