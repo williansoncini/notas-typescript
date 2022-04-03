@@ -5,55 +5,62 @@ Belezera, aqui vou colocar algumas notas de typescript que estou aprendendo :3
 - [Compilando arquivos](#compilando-arquivos)
 - [Script e module mode](#script-e-module-mode)
 - [Executando os arquivos .ts de maneira mais rápida](#executando-os-arquivos-ts-de-maneira-mais-rápida)
-  - [instalação ts-node](#instalação-ts-node)
+	- [instalação ts-node](#instalação-ts-node)
 - [Configuração code runner](#configuração-code-runner)
 - [Configurando o Eslint](#configurando-o-eslint)
-  - [instalação](#instalação-1)
-  - [Arquivo de configuração](#arquivo-de-configuração)
-  - [Exemplo de `.eslintrc.js`](#exemplo-de-eslintrcjs)
-  - [Instanado o Prettier](#instanado-o-prettier)
-  - [Arquivo de configuração](#arquivo-de-configuração-1)
-  - [Configurando o Prettier](#configurando-o-prettier)
+	- [instalação](#instalação-1)
+	- [Arquivo de configuração](#arquivo-de-configuração)
+	- [Exemplo de `.eslintrc.js`](#exemplo-de-eslintrcjs)
+	- [Instanado o Prettier](#instanado-o-prettier)
+	- [Arquivo de configuração](#arquivo-de-configuração-1)
+	- [Configurando o Prettier](#configurando-o-prettier)
 - [Arquivo de configuração do TypeScript](#arquivo-de-configuração-do-typescript)
-  - [Conteudo do arquivo](#conteudo-do-arquivo)
+	- [Conteudo do arquivo](#conteudo-do-arquivo)
 - [Buildando](#buildando)
 - [Tipos privimitos](#tipos-privimitos)
-  - [Tipos básicos](#tipos-básicos)
+	- [Tipos básicos](#tipos-básicos)
 - [Arrays](#arrays)
 - [Objetos](#objetos)
-  - [Funções](#funções)
-  - [Tipo any](#tipo-any)
-  - [Void](#void)
-  - [Tuple](#tuple)
-  - [Undefined](#undefined)
-  - [null](#null)
-  - [Never](#never)
-  - [enum](#enum)
-  - [Unknown](#unknown)
-  - [Union types](#union-types)
-  - [Tipos literais](#tipos-literais)
-  - [Type alias](#type-alias)
-  - [Intersection Types](#intersection-types)
-  - [Funções como tipo](#funções-como-tipo)
-  - [Strutural type](#strutural-type)
-  - [Type assertions](#type-assertions)
-    - [Non-null assertion (!) - Não recomendado](#non-null-assertion----não-recomendado)
-    - [Type assertion - Recomendado ✅](#type-assertion---recomendado-)
+	- [Funções](#funções)
+	- [Tipo any](#tipo-any)
+	- [Void](#void)
+	- [Tuple](#tuple)
+	- [Undefined](#undefined)
+	- [null](#null)
+	- [Never](#never)
+	- [enum](#enum)
+	- [Unknown](#unknown)
+	- [Union types](#union-types)
+	- [Tipos literais](#tipos-literais)
+	- [Type alias](#type-alias)
+	- [Intersection Types](#intersection-types)
+	- [Funções como tipo](#funções-como-tipo)
+	- [Strutural type](#strutural-type)
+	- [Type assertions](#type-assertions)
+		- [Non-null assertion (!) - Não recomendado](#non-null-assertion----não-recomendado)
+		- [Type assertion - Recomendado ✅](#type-assertion---recomendado-)
 - [Configurando o webpack](#configurando-o-webpack)
-  - [instalação](#instalação-2)
-  - [Configuração](#configuração)
-  - [Compilando arquivos](#compilando-arquivos-1)
+	- [instalação](#instalação-2)
+	- [Configuração](#configuração)
+	- [Compilando arquivos](#compilando-arquivos-1)
 - [Importação de libs que precisam de  declaration files](#importação-de-libs-que-precisam-de--declaration-files)
 - [Utilizando o this dentro de  arrow functions](#utilizando-o-this-dentro-de--arrow-functions)
 - [Classes](#classes)
-  - [Criação](#criação)
-  - [Acessos](#acessos)
-    - [Public ( Cuidado ⚠ )](#public--cuidado--)
-    - [Private ( Sempre tente utilizar esse ✅ )](#private--sempre-tente-utilizar-esse--)
-    - [Protected ( Utilizado para herança )](#protected--utilizado-para-herança-)
-- [Herança 👪](#herança-)
-  - [Polimorfismo](#polimorfismo)
-  - [Exemplo](#exemplo)
+	- [Criação](#criação)
+	- [Acessos](#acessos)
+		- [Public ( Cuidado ⚠ )](#public--cuidado--)
+		- [Private ( Sempre tente utilizar esse ✅ )](#private--sempre-tente-utilizar-esse--)
+		- [Protected ( Utilizado para herança )](#protected--utilizado-para-herança-)
+	- [Herança 👪](#herança-)
+		- [Polimorfismo](#polimorfismo)
+		- [Exemplo](#exemplo)
+		- [Construtores em subclasses](#construtores-em-subclasses)
+		- [Super](#super)
+	- [Getter e setter](#getter-e-setter)
+	- [Atributos e metodos estaticos](#atributos-e-metodos-estaticos)
+	- [Construtores privados e singletons](#construtores-privados-e-singletons)
+	- [Classes, metodos e atributos abstrados 📄](#classes-metodos-e-atributos-abstrados-)
+	- [Associação de classes](#associação-de-classes)
 
 # Instalação
 ```js
@@ -775,15 +782,15 @@ const colaborador = new Colaborador('Albert');
 empresa.adicionaColaborador(colaborador);
 ```
 
-# Herança 👪
+## Herança 👪
 Com herança podemos reutilizar muito código, e nela podemos aplicar polimosfirmos, caso desejemos algum comportamento diferente da classe pai.
 
 Uma herança funciona da seguinte forma: O pai tem suas caracteristicas. Quando um pai tem um filho, o filho também terá as caracteristicas do pai. Assim é na programação também.
 
-## Polimorfismo
+### Polimorfismo
 Quando um filho precisa ter um comportamento diferente do pai, ele pode sobreescrever o método do pai, com suas proprias caracteristicas.
 
-## Exemplo
+### Exemplo
 Considere a seguinte estrutura
 
 Site uitlizado: https://www.yworks.com/yed-live/
@@ -825,7 +832,7 @@ class Colaborador extends Pessoa{
 }
 ```
 
-## Construtores em subclasses
+### Construtores em subclasses
 Ao utilizar construtores em suas subclasses, você deve tomar cuidado para não sobrescrever a super classe.
 
 Mas caso você precise de construtores em suas sub classes, o código ficara mais ou menos assim:
@@ -854,7 +861,7 @@ class Aluno extends Pessoa {
 }
 ```
 
-## Super
+### Super
 Algumas vezes precismos acessar a super classe a partir de subclasses, então para isso temos os metodo super.
 
 ```ts
