@@ -61,6 +61,20 @@ Belezera, aqui vou colocar algumas notas de typescript que estou aprendendo :3
 	- [Construtores privados e singletons](#construtores-privados-e-singletons)
 	- [Classes, metodos e atributos abstrados 📄](#classes-metodos-e-atributos-abstrados-)
 	- [Associação de classes](#associação-de-classes)
+	- [Agregação entre classes](#agregação-entre-classes)
+	- [Composição](#composição)
+	- [implementando type alias em classes](#implementando-type-alias-em-classes)
+	- [Interfaces](#interfaces)
+		- [Declaration merging em interfaces](#declaration-merging-em-interfaces)
+- [Tipos avançados](#tipos-avançados)
+	- [Type guards (Validações de tipos)](#type-guards-validações-de-tipos)
+	- [Keyof e typeof](#keyof-e-typeof)
+	- [Utilizando chaves como tipos](#utilizando-chaves-como-tipos)
+	- [Overload](#overload)
+	- [Utilizando o this como tipo](#utilizando-o-this-como-tipo)
+	- [Encadeiamento opcional](#encadeiamento-opcional)
+	- [Operador de coalescencia nula](#operador-de-coalescencia-nula)
+- [Generics](#generics)
 
 # Instalação
 ```js
@@ -1071,3 +1085,334 @@ class Escritor {
 Vale lembrar que aqui também foi aplicado a **inversão de dependencia**, onde o escritor não depende diretamente da caneta ou da maquina de escrever, mas sim de um contrato, que fica responsavél por garantir que o escritor receba aquilo que ele espera.
 
 Escritor fica dependente da class abstrata Ferramenta, que é utilizada em Caneta e Maquina de escrever. 
+
+## Agregação entre classes
+Um carro funciona sem rodas, porém para funcionar adequadamente, ele necessita das rodas. Isso é a agregação, quando algo depende de outra coisa.
+
+ Considere o seguinte exemplo
+
+ ![](img/Diagrama-agregacao.png)
+
+```ts
+class Produto {
+	constructor(
+		public nome : string,
+		public preco : number,
+	){}
+}
+
+class CarrinhoDeCompras{
+	constructor(
+		// Aqui está dependencia
+		private produtos : Produto[],
+	){}
+
+	inserirProduto(produto : Produto) : void {
+		this.produtos.push(produto);
+	};
+
+	quantidade() : number {
+		return this.produtos.length;
+	};
+
+	total() : number {
+		return this.produtos.reduce((soma, produto) => soma + produto.preco, 0);
+	}
+}
+
+```
+
+## Composição
+Um objeto tem outro como parte dele memso. Resumindo uma classe não existe sem a outra, a classe é totalmente dependente da outra.
+
+Considere o seguinte exemplo com carros
+
+![](img/diagrama-composicao.png)
+
+```ts
+class Motor{
+	ligar(): void {
+		console.log('Motor ligado');
+	}
+
+	acelerar() : void {
+		console.log('Moto acelerando')
+	}
+}
+
+class Carro{
+	// Aqui está a composição
+	// O Carro não consegue existir sem o a classes Motor
+	private readonly motor : new Motor();
+
+	ligar(): void {
+		motor.ligar();
+	};
+
+	acelerar(): void{
+		motor.acelerar();
+	}
+}
+```
+
+## implementando type alias em classes
+Ira funcionar como um contrato assim como as coisas abstratas, porém com algumas diferenças.
+
+A implementação via tipos, não podera receber modificadores de acessos como private ou protected, sempre deverá ser public, pois o intuito de uma tipo é expor seus campos mesmo.
+
+> Caso precise de modificadores de acesso, classes são uma melhor opção
+
+Vale lembrar que muitos tipos podem ser implementados ✅
+
+Exemplo
+
+```ts
+type TipoPessoa = {
+	nome: string;
+	sobrenome: string;
+	nomeCompleto: () => string;
+}
+
+// Implementação
+class Pessoa implements TipoPessoa {
+	constructor(
+		public nome: string,
+		public sobrenome: string,
+	){}
+
+	nomeCompleto() : string {
+		return `${this.nome} ${this.sobrenome}`
+	}
+}
+```
+ 
+## Interfaces
+É um contrato que é utilizado pelas classes. Neste contrato assim como no exemplo acima, definimos campos e métodos que a classes precisaram implementar.
+
+Aqui no typscript, type e interface tem a mesma funcionalidade em relação as classes, então as duas opções podem servir como constrato para a classe.
+
+exemplo
+
+```ts
+// Mudança para interface
+interface TipoPessoa {
+	nome: string;
+	sobrenome: string;
+	nomeCompleto: () => string;
+}
+
+// Implementação
+class Pessoa implements TipoPessoa {
+	constructor(
+		public nome: string,
+		public sobrenome: string,
+	){}
+
+	nomeCompleto() : string {
+		return `${this.nome} ${this.sobrenome}`
+	}
+}
+```
+
+### Declaration merging em interfaces
+
+Várias interfacez são unidas se transformando em uma interface maior
+
+```ts
+interface Pessoa{
+	nome: string;
+}
+
+interface Pessoa {
+	readonly sobrenome : string;
+} 
+
+const pessoa : Pessoa = {
+	nome: 'Willian David',
+	sobrenome: 'Soncini',
+}
+```
+
+# Tipos avançados
+## Type guards (Validações de tipos)
+São validações que são utilizadas para que as validações do typescript funcionem.
+
+Acontece muito quanto temos dois tipos em um unico tipo, dessa forma, cabe ao desenvolvedor fazer as devidas validações para que o typescript entenda, a qual tipo ele está se refirindo.
+
+Exemplo da validações
+
+```ts
+type Pessoa {
+	nome: string,
+}
+
+type Animal {
+	cor: string,
+}
+
+type PessoaOuAnimal = Pessoa | Animal;
+
+function monstraNome(obj = PessoaOuAnimal) : void {
+	if ('nome' in obj) console.log(obj.nome);
+	if (obj instanceof Pessoa) console.log(obj.nome)
+}
+```
+
+## Keyof e typeof
+Que maravailha em! Com isso aqui podemos pegar os tipos e chaves que estão em um objeto, isso facilita muito, pois as vezes precisamos de algo mais dinamico.
+
+Exemplo
+
+```ts
+const coresObj = {
+	vermelho: 'red',
+	verde: 'green',
+	azul : 'blue',
+}
+
+// Pegando tipos e chaves dinamicamente
+type CoresObj = typeof coresobj;
+type CoresChaves = keyof coresobj;
+
+function traduzirCor(cor: CoresChaves, cores: CoresObj){
+	return cores[cor];
+}
+
+console.log(traduzirCor('vermelho', coresObj)); // red
+```
+
+## Utilizando chaves como tipos
+Caso seja necessário utilizar as chaves de outro typo ou objeto em algum outro local, é possível realizar tal façanha indicando a chave do objeto.
+
+```ts
+type Veiculo = {
+	marca: string;
+	ano: string;
+};
+
+type Car = {
+	brand: Veiculo['marca'];
+	year: Veiculo['ano'];
+	nome: string;
+}
+```
+
+## Overload
+Uma função se comporta de maneira diferente dependendo da sua quantidade de parametros.
+
+```ts
+type Adder = {
+	(x: number) : number;
+	(x: number, y: number) : number;
+	(...args: number[]) : number;
+};
+
+// Comportamento diferente mediante a quantidade de parametros que são passados.
+const adder: Adder = (x: number, y?: number, ...args: number[]) => {
+	if (args.length > 0) return args.reduce((soma, valorAtual) => soma + valorAtual) + x + (y || 0);
+	return x + (y || 0);
+}
+
+console.log(adder(1)) //1
+console.log(adder(1,2)) //3
+console.log(adder(1,2,3)) //6
+ ```
+
+## Utilizando o this como tipo 
+Utilizando o this como tipo, podemos realizar chamadas em cadeia, pois oque será retornado é o proprio objeto. Então nos permite realizar uma manipulação do objeot de maneira deiferente.
+
+Mais abaixo tem um exemplo utilizando design pattner builder
+
+exemplo básico
+
+```ts
+class Calculadora{
+	constructor(public numero: number){}
+	
+	add(n: number) : this {
+		this.numero += n;
+		return this
+	}
+	
+	sub(n: number) : this {
+		this.numero -= n;
+		return this
+	}
+}
+
+const calculadora = new Calculadora(10);
+
+//Retornando o this, podemos fazer chamadas em cadeia
+calculadora.add(50).sub(5) // 55
+```
+
+**Exemplo utilizando o padrão builder - GoF**
+
+> Com este padrão você pode ir 'construindo' o objeto aos poucos, em vez de definir tudo no construtor
+
+```ts
+class RequestBuilder{
+	private method: 'get' | 'post' | null = null;
+	private url : string | null = null;
+
+	setMethod(method: 'get' | 'post') : this {
+		this.method = method;
+		return this;
+	}
+
+	setUrl(url: string): this {
+		this.url = url;
+		return this;
+	}
+
+	send() : void {
+		console.log('Enviando os dados!')
+	}
+}
+
+const request = new RequestBuilder();
+request.setUrl('https://www.google.com.br');
+request.setMethod('post').send() // Enviando os dados!
+```
+
+## Encadeiamento opcional
+O encadeamento opcional trás uma segurança maior para nosso código, para que quando algo não existir, o valor undefined será retornado.
+
+Caracterizado pelo sinal '?' antes da chamada ao método
+
+```ts
+type Documento = {
+	titulo: string;
+	data? : Date;
+}
+
+// Aqui não deifnimos data
+const documento : Documento = {
+	titulo: 'Titulo',
+}
+
+// Em vez da linha abaixo quebrar nosso código, o valor undefined será trazido.
+console.log(documento.data?.toDateString()); // undefined
+```
+
+## Operador de coalescencia nula
+Checa nulo e undefined. Funciona de maneira semelhante a um coalesce do banco de dados. Caso o valor não existe, oque foi definido na coalescencia nula será executado.
+
+Caracterizado pelo sinal '??'
+
+> Só avalia não valores, que são null e undefined.
+
+Exemplo
+
+```ts
+console.log( null ?? 'Não existe valor'); // Não existe valor
+console.log( undefined ?? 'Não existe valor'); // Não existe valor
+```
+
+
+# Generics
+
+
+
+
+
