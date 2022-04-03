@@ -966,7 +966,7 @@ Exemplo
 
 ```ts
 // Essa classe nunca podera ser instanciada diretamente, ele server apenas como um contrato para que as outras classes implementem e tenham oque nela há.
-abstract class Personamen {
+abstract class Personagem {
 	protected abstract emoji: string; // Todos que herdarem dessa classe, deveram implementar esse atributo
 
 	constructor(
