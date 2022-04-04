@@ -1411,7 +1411,41 @@ console.log( undefined ?? 'Não existe valor'); // Não existe valor
 
 
 # Generics
+Utilizando quando não sabemos qual será o tipo concreto.
 
+Utilizando tipos genéricos, podemos atribuir tipos dinamicamente para um objeto, função ou tipo, essa aplicabilidade se da em vários lugares diferentes.
+
+> Um tipo genérico pode receber qualquer nome, porém por convenção a letra T é utilizada
+
+No exemplo abaixo, a função saberá perfeitamente que os parametros passados serão um number, e que seu retorno será um array de numbers também, porém poderia ser de string, isso dependeria do tipo de dado que passemos. O tipo do parametro que passarmos será o tipo que sera assumido por T (Tipo genérico)
+
+```ts
+// Tipo genérico sendo aplicado (T)
+type FilterCallBack<T> = (
+	value: T,
+	index?: number,
+	array?: T[],
+) => boolean;
+
+// Tipo genérico sendo aplicado (T)
+export function meuFiter<T>(
+	array: T[], callbackfn: FilterCallBack<T>
+	) : T[] {
+	const novoArray = [];
+
+	for (let 1 = 0; i < array.length; i++){
+		if (callbackfn(array[i])) {
+			novoArray.push(array[i]);
+		}
+
+		return novoArray;
+	}
+}
+
+const array = [1,2,3,4,5,6,7];
+const arrayFiltrado = meuFilter(array, (value) => value < 5);
+console.log(arrayFiltrado); // [1,2,3,4]
+```
 
 
 
