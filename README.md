@@ -1447,6 +1447,198 @@ const arrayFiltrado = meuFilter(array, (value) => value < 5);
 console.log(arrayFiltrado); // [1,2,3,4]
 ```
 
+## Array e promisses são genérics
+Você pode setar os valores corretos para promises e arrays, porém geralmente o typescript infere esses tipos. Porém em situações pouco complexas, o ts não conseguira inferir o tipo de suas promises, como por exemplo em consultas a Api's
+
+Tipo genérico de array: `Array<T>`  onde T se trata de um tipo genérico, então você precisa inferir um tipo
+
+**Promises**
+
+Da para setar os tipos que serão inferidos pela Promises
+
+exemplo
+```ts
+// Inferindo o tipo em promises
+async function minhaPromise() : Promise<number> {
+	return new Promise((resolve, reject) => {
+		setTimeout(() => {
+			resolve(1);
+		}, 1000);
+	});
+}
+
+minhaPromise().then((resultado) => console.log(resultado)) // 1
+```
+
+## Gnerics com interfaces e type alias
+Da para utilizar genérics nas interfaces e types normalmente
+
+Exemplo
+
+```ts
+// Colocando os genérics, tipos funcionam da mesma forma.
+interface Pessoa<T, U> {
+	nome: T,
+	sobrenome: U,
+}
+
+// inserindo os tipos dos genérics
+const pessoa: Pessoa<string, string> = {
+	nome: 'Willian',
+	sobrenome: 'Soncini',
+}
+
+// Aqui neste tipo, inferimos tipos padrões
+type Carro<T = string, U = number> {
+	modelo: T,
+	velocidadeMaxima = U,
+}
+
+// Por ter tipos padrões mão é necessário inferir os tipos no código, mas caso fosse um tipo diferente seria somente inferir
+const carro: Carro = {
+	modelo: 'Bugatti Chiron',
+	velocidade: 400
+} 
+```
+
+## Restrições em generics
+As vezes o genérico estara muito amplo, então sera necessário aplicar restrições sobre ele.
+
+exemplo
+
+No exemplo abaixo, definimos que K será no máximo uma chave de K, é assim que se le o código abaixo. Tal restrição permite que o typescrit entenda que K faz parte de O, logo ele permitira tal código.
+
+> Extends dentro dos genéricos significa uma restrição
+
+```ts
+type ObterChaveFn = <O, K extends keyof O> (objeto: O, key: K) => O[K];
+
+const obterChaveFn: ObterChaveFn = (objeto, chave) => objeto[chave];
+
+const pessoa = {
+	nome: 'Willian'
+};
+
+const nomeObjeto = obterChaveFn(wilian, 'nome'); // Willian
+
+```
+
+## Generics com classes
+Quando um tipo genérico é muito utilizado dentro de uma classe, as vezes o typescript não conseguira inferir os valores, então caberá ao desenvolvedor inferir tais tipos.
+
+No exemplo abaixo tivemos que inferir o tipo do genérico para que o typescriot consiga entender a dinamica de seus retornos. Tal tipo inferido, pode ser um number ou uma string.
+
+exemplo
+
+```ts
+class Pilha<T>{
+	private contador = 0;
+	// objeto com array
+	private elements: {[k: number]: T} = {}
+
+	push(elemento: T): void {
+		this.elementos[this.contador] = elemento;
+		this.contador++;
+	}
+
+	pop(): T | void {
+		if (this.estaVazia()) return undefined;
+
+		this.contador--;
+		const elemento = this.elemento[this.contador];
+		delete this.elemento[this.contador];
+		return elemento;
+	}
+
+	estaVazia() :boolean {
+		return this.contador === 0;
+	}
+}
+
+const pilha = new Pilha<number | string>();
+pilha.push(1);
+pilha.pop(); // 1
+```
+
+## Generics com intersection
+Criar um novo objeto a partir da união de dois objetos genéricos
+
+```ts
+function unirObjetos<T, U> (obj1: T, obj2: U) : T & U {
+	//return {...obj1, ...obj2};
+	return Object.assign({}, obj1, obj2);
+}
+
+const obj1 = { chave1: 'primeiro objeto'};
+const obj1 = { chave2: 'segundo objeto'};
+
+const novoObjeto = unirObjetos(obj1, obj2); // { chave1: 'primeiro objeto', chave2: 'segundo objeto' }
+```
+
+## Type Predicate
+Em funções que retornam boolean, podemos inferir o tipo se baseando em quando o retorno for verdadeiro.
+
+exemplo
+
+```ts
+//inferindo number quando o retorno for verdadeiro
+function isNumber(value: unknown) : value is number {
+	return typeof value === 'number';
+}
+
+function soma<T>(...args: T[]) : number {
+	const retorno = args.reduce((soma, valor) => {
+		if (isNumber(soma) && isNumber(valor)){
+			//Aqui ele sabera que os dois valores serão number, devido ao retorno predicado da função acima
+			return soma + valor;
+		}
+
+		return soma;
+	}, 0);
+}
+
+console.log(soma(1,2,3))// 6
+```
+
+## Utility types
+Com os métodos abaixo é possivel realizar desde filtros até a transformações de campos de seus tipos. 
+
+São os principais
+
+```ts
+// Somente criando os tipos
+type Tipo = {id: string}
+type ABC = 'A'|'B'|'C';
+type CDE = 'C'|'D'|'E';
+
+//Utility types
+type TipoRequired = Required<Tipo> // Deixa todos os campos de seu tipo como required
+type TipoPartial = Partial<Tipo> // Deixa todos os campos de seu tipo como não requerido
+type TipoReadonly = Readonly<Tipo> // Deixa todos os campos como readonly
+type TipoPick = Pick<Tipo, 'id'> // Pega somente as chaves que você escolher
+type ABCExclude = Exclude<ABC, CDE> // Computa somente oque há de diferente entre os dois tipos - AB
+type ABCExtract = Extract<ABC, CDE>// Trás somente oque há de igual entre os tipos - C
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
