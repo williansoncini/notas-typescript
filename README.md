@@ -75,6 +75,13 @@ Belezera, aqui vou colocar algumas notas de typescript que estou aprendendo :3
 	- [Encadeiamento opcional](#encadeiamento-opcional)
 	- [Operador de coalescencia nula](#operador-de-coalescencia-nula)
 - [Generics](#generics)
+	- [Array e promisses são genérics](#array-e-promisses-são-genérics)
+	- [Gnerics com interfaces e type alias](#gnerics-com-interfaces-e-type-alias)
+	- [Restrições em generics](#restrições-em-generics)
+	- [Generics com classes](#generics-com-classes)
+	- [Generics com intersection](#generics-com-intersection)
+	- [Type Predicate](#type-predicate)
+	- [Utility types](#utility-types)
 
 # Instalação
 ```js
