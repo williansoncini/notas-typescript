@@ -1627,17 +1627,258 @@ type ABCExclude = Exclude<ABC, CDE> // Computa somente oque há de diferente ent
 type ABCExtract = Extract<ABC, CDE>// Trás somente oque há de igual entre os tipos - C
 ```
 
+# Decorators
+É um objeto que finge ser seu objeto real, ele pode realizar coisas antes de entregar o objeto.
+
+**Ele está em experimento ainda no começo de 2022, então tome cuidado com o uso dele**
+
+Link docs: https://www.typescriptlang.org/docs/handbook/decorators.html
+
+> Para que funcione se lembre de descomentar as seguintes linhas no seu arquivo `tsconfig.json`
+
+```json
+	"ExperimentalDecorators": true,
+	"emitDecoratorMetadata" : true,
+```
+
+Exemplo simples
+
+```ts
+export class Animal {
+	constructor(public cor : string) {}
+}
+
+function decorador(target: any): any {
+	console.log('Posso fazer algumas coisas antes!');
+	return target;
+}
+
+const AnimalDecorated = decorador(Animal);
+const animal = new AnimalDecorated('roxo');
+console.log(animal);
+```
+
+Perceba que a classe foi entregue mas eu poderia altera-la antes de entregar de fato para minha variavel.
+
+É isso que vamos fazer abaixo:
+
+Exemplo de utilização com alteração de classes
+
+```ts
+interface Constructor {
+	new (...args: any[]): any;
+}
+
+@decorador
+export class Animal {
+	constructor(
+		public nome: string,
+		public cor: string,
+	)
+}
+
+function decorador (target: Constructor) {
+	return class extends target {
+		cor: string;
+		nome: string;
+
+		constructor(...args: any[]){
+			super(...args);
+			this.nome = nome.toUpperCase();
+			this.cor = cor.toUpperCase();
+		}
+	}
+}
+
+const animal = new Animal('Spike', 'Marrom');
+animal // { nome: 'SPIKE', cor: 'MARROM'}
+```
+
+Exemplo de utilização com alteração de classes utilizando genérics
+
+```ts
+@decorador
+export class Animal {
+	constructor(
+		public nome: string,
+		public cor: string,
+	)
+}
+// Tipando o construtor da classe utilizando o new
+function decorador<T extends new (...args: any[]) => any> (target: T): T{
+	return class extends target {
+		cor: string;
+		nome: string;
+
+		constructor(...args: any[]){
+			super(...args);
+			this.nome = nome.toUpperCase();
+			this.cor = cor.toUpperCase();
+		}
+	}
+}
+
+const animal = new Animal('Spike', 'Marrom');
+animal // { nome: 'SPIKE', cor: 'MARROM'}
+```
+
+No exemplo acima é possível implementar um decorator para a classe de Animal, tornando possível implementar novos métodos e validações para a classe. Assim podemos implementar o decorator diretamente utilizando a própria classe Animal, devido ao trecho `@decorator`
+
+## Decorator Factories
+É um função que retorna uma função decoradora, com ela é possível receber parametros para usarmos dentro do decorator.
+
+```ts
+interface Constructor {
+	new (...args: any[]): any;
+}
 
 
+@factoryDecorator('Decoretor');
+export class Animal {
+	constructor(
+		public nome: string,
+	)
+}
 
+function factoryDecorator (param: string){
+	return function (target: Constructor) {
+		constructor(...args: any[]){
+			super(...args);
+			this.nome = nome + param;
+		}
+	}
+}
 
+const animal = new Animal('Spike'); // { nome: 'SpikeDecorator' }
+```
 
+## Composição de decoradores
+Da para utilizar mais de uma decorador para a mesma classe
 
+```ts
+interface Constructor {
+	new (...args: any[]): any;
+}
 
+@outroDecorator //2
+@factoryDecorator('Decoretor'); //1
+export class Animal {
+	constructor(
+		public nome: string,
+	)
+}
 
+function outroDecorator(target: Constructor) {
+	console.log('Sou o outro decorator');
+}
 
+function factoryDecorator (param: string){
+	return function (target: Constructor) {
+		constructor(...args: any[]){
+			super(...args);
+			this.nome = nome + param;
+		}
+	}
+}
 
+const animal = new Animal('Spike'); // { nome: 'SpikeDecorator' }
+```
 
+## Decoradores de métodos (method decorator)
+Você pode assim como mudar a classe, mudar também o método. Podendo alterar desde suas configurações de writable até seus valores de retorno.
+
+```ts
+function decorador (
+	classPrototype: any,
+	nomeMetodo: string,
+	descriptor: PropertyDescriptor,
+) : PropertyDescriptor {
+	return {
+		writable: false,
+		enumerable: false,
+		configurable: false,
+		// Aqui estamos alterando o retorno genuino da função
+		value: function (..args: string[]) {
+			return args[0].toUpperCase();
+		}
+	}
+}
+
+class Pessoa {
+	constructor(
+		private nome: string,
+	){}
+	
+	// Agora esse métdodo terá as configurações que estão setadas no decorador
+	@decorador
+	metodo(): string {
+		return `${this.nome} arrasa!`
+	}
+}
+
+const pessoa = new Pessoa('Albert');
+pessoa.metodo(); // ALBERT ARRASA!
+```
+
+## Decorador de parametro
+Pelo que foi visto em aula, ainda não conseguimos alterar o valor de um parametro via decorador, ele serve mais para assistir e trazer algumas informações, caso ache pertinente.
+
+```ts
+function decorador (
+	classPrototype: any,
+	nomeMetodo: string | symbol,
+	index: number,
+) : any {
+	console.log(classPrototype);
+	console.log(nomeMetodo);
+	console.log(index);
+}
+
+class Pessoa {
+	constructor(
+		@decorador private nome: string,
+	){}
+}
+
+const pessoa = new Pessoa('Albert');
+```
+
+## Decorador de propriedades
+Deixa você alterar desde as propriedades de um parametro, até mesmo configurar get e set por meio do decorador.
+
+Exemplo
+
+```ts
+function decorador (
+	classPrototype: any,
+	nome: string | symbol,
+) : any {
+	let valorPropriedade: any;
+	return {
+        writabe: true,
+		get: () => valorPropriedade,
+		set: (valor: any) => valorPropriedade = valor,
+	}
+}
+
+export class Pessoa {
+    @decorador
+    nome: string;
+
+	constructor(nome: string){
+        this.nome = nome;
+    }
+}
+
+const pessoa = new Pessoa('Albert');
+pessoa.nome = 'Einstein';
+console.log(pessoa.nome) // Einstein
+```
+
+## Todos os decoradores
+Através desse link, você pode conferir uma vasta gama de exemplo com decoradores
+
+https://github.com/luizomf/cursojstypescript/blob/master/src/A0058-todos-os-decorators/A0058-todos-os-decorators.ts
 
 
 
