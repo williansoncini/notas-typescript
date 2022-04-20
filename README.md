@@ -82,6 +82,16 @@ Belezera, aqui vou colocar algumas notas de typescript que estou aprendendo :3
 	- [Generics com intersection](#generics-com-intersection)
 	- [Type Predicate](#type-predicate)
 	- [Utility types](#utility-types)
+- [Decorators](#decorators)
+	- [Decorator Factories](#decorator-factories)
+	- [Composição de decoradores](#composição-de-decoradores)
+	- [Decoradores de métodos (method decorator)](#decoradores-de-métodos-method-decorator)
+	- [Decorador de parametro](#decorador-de-parametro)
+	- [Decorador de propriedades](#decorador-de-propriedades)
+	- [Todos os decoradores](#todos-os-decoradores)
+- [Namespaces](#namespaces)
+	- [Importação](#importação)
+- [Bibliotecas de terceiros](#bibliotecas-de-terceiros)
 
 # Instalação
 ```js
@@ -1881,10 +1891,48 @@ Através desse link, você pode conferir uma vasta gama de exemplo com decorador
 https://github.com/luizomf/cursojstypescript/blob/master/src/A0058-todos-os-decorators/A0058-todos-os-decorators.ts
 
 
+# Namespaces
+Utilizado para criar espaços restritos na aplicação, porém você pode exportar variaveis, funções e classes utilizando o `export`. É bem semelhante ao sistema de módulos o ES6.
 
+> Geralmente o indicado é utilizar o sistema de módulos do própria JS, por ter uma amplitude maior de funcionamento. Pois esse recurso funciona somente no TypeScript
 
+exemplo 
+```ts
+namespace MeuNameSpace {
+	export const nome = 'Willian'
+}
 
+console.log(MeuNameSpace.nome) // Willian
+```
 
+Para conseguir utilizar essa funcionalidade, é necessário alterar o arquivo `tsconfig.json` 
+
+Linhas a serem alteradas
+```json
+	"module": "" //Utilizar AMD ou System
+	"outFile": "" //É necessário informar um arquivo de saída que seja único, pois para que essa funcionalidade possa ser utilizada, é necesário somente um arquivo compilado.
+```
+
+## Importação
+Para realizar  a importação de outros namespaces, é necessário fazer da maneira que está logo abaixo:
+
+> Lembrando que estamos importando o arquivo inteiro. Logo tudo oque está sendo exportado no arquivo file.ts, poderá ser utilizado.
+
+```ts
+/// <reference path="path/file.ts" />
+```
+
+# Bibliotecas de terceiros
+Para utilizar bibliotecas de terceiros do JS, é necessário instalar sua tipagem como dependencia de desenvolvimento
+
+**Exemplo**
+
+```js
+npm i validator
+npm i @types/validator -D
+```
+
+As vezes a tipagem já vem na instalção normal, porém é bom confirmar na documentação da biblioteca 👍🏻
 
 
 
